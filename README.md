@@ -22,4 +22,13 @@ The goal is to explore deploying a fully local chatbot solution without relying 
 
 ## 🏗️ Project Structure
 
-yet to create
+
+```bash
+├── src/
+│   ├── app/
+│   │   └── app.py             # Streamlit frontend
+│   ├── phidata/
+│   │   ├── phidata_config.py  # Phidata configuration
+│   │   └── chatbot_agent.py   # Bot logic / pipeline
+├── requirements.txt            # Python dependencies
+└── README.md                   # This file
