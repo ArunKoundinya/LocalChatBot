@@ -1,0 +1,10 @@
+models/*
+output/*
+input/*
+experiments/*
+*.json
+*.png
+%.txt
+*.log
+*.csv
+
