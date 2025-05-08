@@ -26,10 +26,10 @@ The goal is to explore deploying a fully local chatbot solution without relying 
 ```bash
 ├── src/
 │   ├── app/
-│   │   └── app.py             # Streamlit frontend
+│   │   └── app.py              # Streamlit frontend
 │   ├── phidata/
-│   │   └── phidata.py   # Bot logic / pipeline
+│   │   └── phidata.py          # Bot logic / pipeline
 │   ├── utils/
-│   │   └── utils.py   # Bot logic / pipeline
+│   │   └── utils.py            # Support Utilty function; Common Logics
 ├── requirements.txt            # Python dependencies
 └── README.md                   # This file
