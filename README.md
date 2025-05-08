@@ -28,7 +28,8 @@ The goal is to explore deploying a fully local chatbot solution without relying 
 │   ├── app/
 │   │   └── app.py             # Streamlit frontend
 │   ├── phidata/
-│   │   ├── phidata_config.py  # Phidata configuration
-│   │   └── chatbot_agent.py   # Bot logic / pipeline
+│   │   └── phidata.py   # Bot logic / pipeline
+│   ├── utils/
+│   │   └── utils.py   # Bot logic / pipeline
 ├── requirements.txt            # Python dependencies
 └── README.md                   # This file
