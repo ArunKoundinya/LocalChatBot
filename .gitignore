@@ -1,2 +1,9 @@
 models/*
 experiments/*
+.venv/
+__pycache__/
+*.pyc
+
+agents.db
+*.md
+src/phidata/.env
