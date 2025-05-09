@@ -27,8 +27,8 @@ The goal is to explore deploying a fully local chatbot solution without relying 
 ├── src/
 │   ├── app/
 │   │   └── app.py              # Streamlit frontend
-│   ├── langchain/
-│   │   └── langchain.py          # Bot logic / pipeline
+│   ├── myagent/
+│   │   └── langchain_agent.py  # Bot logic / pipeline
 │   ├── utils/
 │   │   └── utils.py            # Support Utilty function; Common Logics
 ├── requirements.txt            # Python dependencies
