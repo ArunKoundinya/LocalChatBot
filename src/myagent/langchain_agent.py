@@ -1,42 +1,77 @@
-from langchain_community.llms import Ollama
-import textwrap
+# File: chatbot_engine.py
+from langchain_ollama.llms import OllamaLLM
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.tools import DuckDuckGoSearchResults
+from langchain.prompts import PromptTemplate
+import configparser
 
-model = Ollama(model="llama3.2:latest")
+config = configparser.ConfigParser()
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+config.read('src/myagent/models_prompts.ini')
 
-search = DuckDuckGoSearchResults(k=5)
-# Initialize DuckDuckGo with TOP 5 results only
-search = DuckDuckGoSearchResults(k=5)  # Limits to 5 results
+ollama_model = config.get('model', 'ollama')
+context_text = config.get('botcontext', 'context')
+botname = config.get('names', 'name')
+username = config.get('names', 'username')
 
-def generate_markdown_report(query: str) -> str:
-    # Fetch search results
-    results = search.run(query)
-    
-    # Generate structured summary
-    prompt = f"""
-    **Task:** Create a detailed, engaging Markdown report about: "{query}".
-    
-    **Search Results:**
-    {results}
-    
-    **Format Requirements:**
-    1. Start with "## [Emoji] Engaging Title" (make it catchy)
-    2. Include sections: "### Overview", "### Key Breakthroughs", "### Implications", "### Synopsis"
-    3. Write in concise, lively language with bullet points for readability
-    4. Include 5 reference links at the end
-    5. Use emojis sparingly for emphasis
-    """
-    
-    report = model.invoke(prompt)
-    
-    # Format with consistent spacing
-    return textwrap.dedent(f"""
-    <!-- AUTO-GENERATED AI REPORT -->
-    {report}
-    """).strip()
+#stripspace
+context_text = context_text.strip()
 
-# Example usage
-if __name__ == "__main__":
-    query = "Give me a detailed summary of Pushpa2 movie"
-    markdown_report = generate_markdown_report(query)
-    print(markdown_report)
+
+model = OllamaLLM(model=ollama_model)
+search = DuckDuckGoSearchResults(k=3)
+
+default_prompt = """You are my personal guide. based our chat history, you will answer my questions.
+chat history: {chat_history}
+user: {query}
+"""
+summarize_search_promt = """ Summarize your understanding {query} using these search results:
+{search_results}
+and 
+chat_history : {chat_history}
+user: {user_input}
+"""
+
+searchintent_template = PromptTemplate.from_template(
+    """You are an assistant that generates concise search queries for a search engine.
+Only return the actual search query string. No explanations or formatting.
+
+User input: {user_input}
+
+Search Query:"""
+)
+
+default_prompt_template = ChatPromptTemplate.from_template(default_prompt)
+search_prompt_template = ChatPromptTemplate.from_template(summarize_search_promt)
+
+searchintent = searchintent_template | model
+search_prompt = search_prompt_template | model
+no_search_prompt = default_prompt_template | model
+
+class ChatBotEngine:
+    def __init__(self):
+        self.chat_history = f"{botname}:\n{context_text}\n"
+
+    def ask(self, user_input):
+        if "search" in user_input.lower():
+            raw_query = searchintent.invoke({"user_input": user_input})
+            query = raw_query.strip().splitlines()[-1].strip().strip('"')
+            print(f"🔍 Searching for: {query}...")
+            response = search_prompt.invoke({
+                "query": query,
+                "search_results": search.run(query),
+                "chat_history": self.chat_history,
+                "user_input": user_input
+            })
+        else:
+            response = no_search_prompt.invoke({
+                "chat_history": self.chat_history,
+                "query": user_input
+            })
+        self.chat_history += f"{username}: {user_input}\n{botname}: {response}\n"
+        chat_lines = self.chat_history.strip().split("\n")
+        if len(chat_lines) > 10:
+            self.chat_history = "\n".join(chat_lines[-10:])
+        return response

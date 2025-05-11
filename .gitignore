@@ -7,3 +7,4 @@ __pycache__/
 agents.db
 *.md
 src/phidata/.env
+src/myagent/models_prompts.ini
